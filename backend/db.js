@@ -1,15 +1,42 @@
+require('dotenv').config();
+
 const mongoose = require('mongoose');
 
-mongoose.connect("your mongodb url");
+mongoose.connect(process.env.MONGO_URL);
 
-const Schema = mongoose.Schema;
+const {Schema,model,ObjectId} = mongoose;
 
 const User = new Schema({
-  username : {type : String , unique : true},
+  email : {type : String , unique : true},
   password : String,
-  name : String
+  firstName : String,
+  lastName : String
 });
 
 
-UserModel = mongoose.model('users',User);
+const Admin = new Schema({
+  email : {type : String , unique : true},
+  password : String,
+  firstName : String,
+  lastName : String
+})
 
+const Course = new Schema({
+  title : String,
+  createrId : ObjectId,
+  imageUrl : String,
+  description : String,
+  price : Number
+})
+
+const Purchase = new Schema({
+  userId : ObjectId,
+  courseId : ObjectId
+})
+
+const userModel = model('users',User);
+const adminModel = model('admin',Admin);
+const courseModel = model('courses',Course);
+const purchaseModel = model('purchases',Purchase);
+
+module.exports = {userModel,adminModel,courseModel,purchaseModel};
