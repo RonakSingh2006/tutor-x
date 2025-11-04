@@ -3,6 +3,7 @@ const {userModel} = require('../db');
 const z = require('zod');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const userAuth = require("../middlewares/userAuth");
 
 const JWT_SECRET = process.env.JWT_USER_SECRET;
 
@@ -68,6 +69,9 @@ userRouter.post("/signin",async (req,res)=>{
 
 })
 
+
+// auth middleware
+userRouter.use(userAuth);
 
 // purchased courses
 userRouter.get("/purchases",(req,res)=>{

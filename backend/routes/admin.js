@@ -4,6 +4,7 @@ const JWT_SECRET = process.env.JWT_ADMIN_SECRET;
 const z = require('zod');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const adminAuth = require('../middlewares/adminAuth')
 
 const adminRouter = Router();
 
@@ -64,8 +65,10 @@ adminRouter.post("/signin",async (req,res)=>{
   res.send({token});
 })
 
-adminRouter.post("/course",(req,res)=>{
+adminRouter.use(adminAuth);
 
+adminRouter.post("/course",(req,res)=>{
+  res.send("hello");
 })
 
 adminRouter.put("/course",(req,res)=>{
