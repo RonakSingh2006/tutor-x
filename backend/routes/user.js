@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const {userModel} = require('../db');
+const {userModel,purchaseModel} = require('../db');
 const z = require('zod');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -74,8 +74,17 @@ userRouter.post("/signin",async (req,res)=>{
 userRouter.use(userAuth);
 
 // purchased courses
-userRouter.get("/purchases",(req,res)=>{
-  res.send("Temp");
+userRouter.get("/purchases",async (req,res)=>{
+  let userId  = req.userId;
+
+  try{
+    let purchases = await purchaseModel.find({userId});
+
+    res.send(purchases);
+  } 
+  catch(err){
+    res.status(400).send(err);
+  }
 })
 
 
