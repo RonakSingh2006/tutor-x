@@ -1,5 +1,5 @@
 const {Router} = require('express');
-const {adminModel} = require('../db');
+const {adminModel,courseModel} = require('../db');
 const JWT_SECRET = process.env.JWT_ADMIN_SECRET;
 const z = require('zod');
 const jwt = require('jsonwebtoken');
@@ -67,16 +67,93 @@ adminRouter.post("/signin",async (req,res)=>{
 
 adminRouter.use(adminAuth);
 
-adminRouter.post("/course",(req,res)=>{
-  res.send("hello");
+adminRouter.post("/course", async (req,res)=>{
+  const adminId = req.adminId;
+
+  const courseSchema = z.object({
+    title : z.string(),
+    imageUrl : z.string(),
+    description : z.string(),
+    price : z.number()
+  })
+
+  let parsed = courseSchema.safeParse(req.body);
+
+  if(!parsed.success){
+    return res.status(400).send(JSON.parse(parsed.error));
+  }
+
+  const {title,imageUrl,description,price} = parsed.data;
+
+  try{
+    const course = await courseModel.create({
+      title,
+      imageUrl,
+      description,
+      price,
+      createrId : adminId
+    })
+
+    res.json({
+      message : "course added",
+      courseId : course._id
+    });
+  }
+  catch(err){
+    res.status(400).send(err);
+  }
+
 })
 
-adminRouter.put("/course",(req,res)=>{
+adminRouter.put("/course",async (req,res)=>{
+  const adminId = req.adminId;
 
+  const courseSchema = z.object({
+    title : z.string(),
+    imageUrl : z.string(),
+    description : z.string(),
+    price : z.number(),
+    courseId : z.string()
+  })
+
+  let parsed = courseSchema.safeParse(req.body);
+
+  if(!parsed.success){
+    return res.status(400).send(JSON.parse(parsed.error));
+  }
+
+  const {title,imageUrl,description,price,courseId} = parsed.data;
+
+  try{
+    await courseModel.updateOne({
+      _id : courseId,
+      createrId : adminId
+    },{
+      title,
+      imageUrl,
+      description,
+      price,
+      createrId : adminId
+    })
+
+    res.send("course updated");
+  }
+  catch(err){
+    res.status(400).send(err);
+  }
 })
 
-adminRouter.get("/course/bulk",(req,res)=>{
+adminRouter.get("/course/bulk", async (req,res)=>{
+  const adminId = req.adminId;
 
+  try{
+    let courses = await courseModel.find({createrId : adminId});
+
+    res.send(courses);
+
+  }catch(err){
+    res.status(400).send(err);
+  }
 })
 
 module.exports = adminRouter;
