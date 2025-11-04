@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const mongoose = require('mongoose');
 
 mongoose.connect(process.env.MONGO_URL);
@@ -35,7 +33,7 @@ const Purchase = new Schema({
 })
 
 const userModel = model('users',User);
-const adminModel = model('admin',Admin);
+const adminModel = model('admins',Admin);
 const courseModel = model('courses',Course);
 const purchaseModel = model('purchases',Purchase);
 
